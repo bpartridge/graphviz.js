@@ -1,4 +1,4 @@
-EMSCRIPTEN_ROOT=$(shell ./find_emscripten)
+EMSCRIPTEN_ROOT=$(shell python find_emscripten.py)
 EMCONFIGURE=$(EMSCRIPTEN_ROOT)/emconfigure
 EMCC=$(EMSCRIPTEN_ROOT)/emcc
 
@@ -13,12 +13,20 @@ PLUGINS=$(addprefix $(INSTALLDIR)/lib/graphviz/,libgvplugin_core.a libgvplugin_d
 INCLUDEDIR=$(INSTALLDIR)/include/graphviz
 
 .PHONY: all clean cleanjs
-all: graphviz.js
+all: graphviz.min.js
+
+# Working in Node but not in browser
+graphviz.opt.js: graphviz-js-wrapper.c | $(INSTALLDIR)/lib
+	EMCC_DEBUG=1 $(EMCC) -o $@ $< $(PLUGINS) $(INSTALLED_LIBS) -I$(INCLUDEDIR) \
+		-O2 -s EXPORTED_FUNCTIONS="['_graphvizjs']"
+
+graphviz.min.js: graphviz.js
+	jsmin < $< > $@
 
 # Note that the order here is extremely important!
 # Plugins must be linked before the libraries, otherwise dead code stripping will kill things
 graphviz.js: graphviz-js-wrapper.c | $(INSTALLDIR)/lib
-	EMCC_DEBUG=1 $(EMCC) -o $@ $< $(PLUGINS) $(INSTALLED_LIBS) -I$(INCLUDEDIR) -O1
+	EMCC_DEBUG=1 $(EMCC) -o $@ $< $(PLUGINS) $(INSTALLED_LIBS) -I$(INCLUDEDIR) -O1 --llvm-opts 3
 
 $(INSTALLDIR)/lib: | $(SRCDIR)/Makefile $(INSTALLDIR)
 	cd $(SRCDIR) && make -i && $(CC) lib/gvpr/mkdefs.c -o lib/gvpr/mkdefs && make
@@ -47,7 +55,7 @@ $(SRCDIR)/Makefile: | $(SRCDIR) $(INSTALLDIR)
 $(INSTALLDIR):
 	mkdir -p $(INSTALLDIR)
 
-$(SRCDIR): graphviz-src.tar.gz
+$(SRCDIR): | graphviz-src.tar.gz
 	mkdir -p $(SRCDIR)
 	tar xjf graphviz-src.tar.gz -C $(SRCDIR) --strip=1
 
@@ -59,4 +67,4 @@ clean: cleanjs
 	rm -rf $(INSTALLDIR)
 
 cleanjs:
-	rm -f graphviz.js
+	rm -f graphviz*.js
