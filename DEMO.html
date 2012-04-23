@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>graphviz.js</title>
+    <style>
+      textarea {width: 35%;}
+    </style>
+    <script src='http://cdnjs.cloudflare.com/ajax/libs/headjs/0.96/head.min.js'></script>
+    <script type='text/javascript'>
+      head.js('http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js')
+      head.js('http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js')
+      head.js('graphviz.js')
+      head.ready(function() {
+        $('.loading').remove();
+        var gv = Module.cwrap('graphvizjs','string',['string','string','string']);
+        $('#submit').click(function() {
+          var input = $('#input').val();
+          var format = $('#format').val();
+          var output = gv(input, 'dot', format);
+          $('#output').val(output);
+          return false;
+        }).click();
+      });
+    </script>
+  </head>
+  <body>
+    <p>
+    </p>
+    <h1 class="loading">Loading...</h1>
+    <form>
+      <textarea id="input" rows="20">digraph g 
+{
+  a -> b -> c;
+  a -> d -> c;
+}</textarea>
+      <span>
+        <select id="format">
+          <option value="plain">plain</option>
+          <option value="dot">dot</option>
+        </select>
+        <input id="submit" type="submit"></input>
+      </span>
+      <textarea id="output" rows="20"></textarea>
+    </form>
+  </body>
+</html>
