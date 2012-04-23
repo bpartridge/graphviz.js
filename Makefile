@@ -27,7 +27,7 @@ $(INSTALLDIR)/lib: | $(SRCDIR)/Makefile $(INSTALLDIR)
 
 # Need pipe | here to just look for presence, not how new directories are
 $(SRCDIR)/Makefile: | $(SRCDIR) $(INSTALLDIR)
-	cd $(SRCDIR) && $(EMCONFIGURE) ./configure \
+	cd $(SRCDIR) && CPATH=$(CURDIR)/sysinclude:${CPATH} $(EMCONFIGURE) ./configure \
 		--enable-swig=no --enable-sharp=no --enable-go=no \
 		--enable-io=no --enable-java=no --enable-lua=no \
 		--enable-ocaml=no --enable-perl=no --enable-php=no \
