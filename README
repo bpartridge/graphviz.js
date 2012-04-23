@@ -2,7 +2,9 @@ graphviz.js is an experimental port of the Graphviz graph visualization software
 
 graphviz.js contains all the required code, and it can be minified to fit your use case.
 
-To build the library from the graphviz source code, use the supplied Makefile, which will download the graphviz source code and compile it using your installed version of emscripten (as per your ~/.emscripten file). Currently, emscripten requires the following fixes:
+To build the library from the graphviz source code, use the supplied Makefile, which will download the graphviz source code and compile it using your installed version of emscripten (as per your ~/.emscripten file). Both of the following fixes to emscripten are worked around in the most recent version of this repository, although they should eventually be submitted as issues.
+
+============
 
 Outstanding issue in emscripten when <sys/types.h> is included before <stdint.h>... hack is to comment out block at stdint.h:114 as follows:
 
@@ -22,4 +24,4 @@ typedef unsigned int uint64_t;
 #endif
 #endif
 
-Because the dirent struct is never actually used, it only occurs as a return value by pointer in glob.h, it shows up in the .ll as an opaque type. Unfortunately, this breaks runtime.js, which expects the type to match library.js's description of what a dirent should be. By commenting out this assertion, it's possible that dirent will no longer work. But since we don't expect the code to be globbing files anyways, it seems to be acceptable.
+If the dirent struct is never actually used, it only occurs as a return value by pointer in glob.h, and it shows up in the .ll as an opaque type. Unfortunately, this breaks runtime.js, which expects the type to match library.js's description of what a dirent should be. By commenting out this assertion, it's possible that dirent will no longer work. But since we don't expect the code to be globbing files anyways, it seems to be acceptable.

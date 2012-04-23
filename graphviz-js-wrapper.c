@@ -4,6 +4,10 @@
 extern gvplugin_library_t gvplugin_dot_layout_LTX_library;
 extern gvplugin_library_t gvplugin_core_LTX_library;
 
+// To work around a bug in emscripten
+#include <dirent.h>
+struct dirent _fake_dirent;
+
 static GVC_t *gvc;
 enum {ERRBUF_LEN = 1024};
 static char errbuf[ERRBUF_LEN];
